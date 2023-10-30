@@ -47,9 +47,10 @@ int main(int argc, char *argv[]) {
     memset(nom_executable, 0, nom_programme_len);
     strncpy(nom_executable, nom_programme, nom_programme_len - 2);
     // affichage
-    printf("nom du programme: %s\n", nom_programme);
-    printf("nom du module objet: %s\n", nom_module_objet);
-    printf("nom de l'exécutable: %s\n", nom_executable);
+    printf("-----------------------------------------------------------------\n");
+    printf("compilation du programme %s\n", nom_programme);
+    printf("nom de l'exécutable à créer: %s\n", nom_executable);
+    printf("nom du module objet à créer: %s\n", nom_module_objet);
     pid_t p = fork(); /* 1 */
     if (p == 0) {
         // process P1
@@ -60,10 +61,9 @@ int main(int argc, char *argv[]) {
         }
     } else if (p > 0) {
         p = waitpid(p, &status, 0);
-        if (p >> 8 != 0) {
-            printf("Le processus 1 n'a pas créé le module objet\n");
-            exit(EXIT_FAILURE);
-        }
+        printf("-----------------------------------------------------------------\n");
+        printf("status du P1:\n");
+        handle_returned_status(p, status);
         p = fork(); /* 2 */
         if (p == 0) {
             // process P2
@@ -74,10 +74,9 @@ int main(int argc, char *argv[]) {
             }
         } else if (p > 0) {
             p = waitpid(p, &status, 0);
-            if (p >> 8 != 0) {
-                printf("Le processus 2 n'a pas créé le programme exécutable\n");
-                exit(EXIT_FAILURE);
-            }
+            printf("-----------------------------------------------------------------\n");
+            printf("status du P2:\n");
+            handle_returned_status(p, status);
             p = fork(); /* 3 */
             if (p == 0) {
                 // process P3
@@ -85,6 +84,9 @@ int main(int argc, char *argv[]) {
                 memset(executer_programme, 0, nom_programme_len + 1);
                 strncpy(executer_programme, "./", 2);
                 strcat(executer_programme, nom_executable);
+                printf("-----------------------------------------------------------------\n");
+                printf("execution du programme %s\n", nom_programme);
+                printf("-----------------------------------------------------------------\n");
                 err = execlp(executer_programme, nom_executable, NULL);
                 if (err == -1) {
                     printf("\n erreur dans l'execution du programme\n");
@@ -92,7 +94,10 @@ int main(int argc, char *argv[]) {
                 }
             } else if (p > 0) {
                 p = waitpid(p, &status, 0);
+                printf("-----------------------------------------------------------------\n");
+                printf("status du programme quand a executer %s :\n\n", nom_programme);
                 handle_returned_status(p, status);
+                printf("-----------------------------------------------------------------\n");
             } else {
                 perror("fork");
                 exit(EXIT_FAILURE);
