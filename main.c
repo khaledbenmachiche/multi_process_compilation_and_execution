@@ -28,7 +28,7 @@ int code_retour_tests(pid_t p, int status) {
 }
 
 int main(int argc, char *argv[]) {
-    if (argc != 2) {
+    if (argc > 2) {
         printf("utilisation: %s <programme.c>\n", argv[0]);
         return 1;
     }
@@ -41,21 +41,28 @@ int main(int argc, char *argv[]) {
         printf("Le nom du programme doit avoir au moins 3 caractères\n");
         return 1;
     }
+    if (nom_programme[nom_programme_len - 1] != 'c' || nom_programme[nom_programme_len - 2] != '.') {
+        printf("Le nom du programme doit se terminer par .c\n");
+        return 1;
+    }
     // nom du module objet
     char nom_module_objet[nom_programme_len + 1];
     memset(nom_module_objet, 0, nom_programme_len + 1);
     strncpy(nom_module_objet, nom_programme, nom_programme_len - 2);
     strcat(nom_module_objet, ".o");
+
     // nom d'exécutable
     char nom_executable[nom_programme_len - 1];
     memset(nom_executable, 0, nom_programme_len);
     strncpy(nom_executable, nom_programme, nom_programme_len - 2);
+
     // affichage
     printf("-----------------------------------------------------------------\n");
     printf("compilation du programme %s\n", nom_programme);
     printf("nom de l'exécutable à créer: %s\n", nom_executable);
     printf("nom du module objet à créer: %s\n", nom_module_objet);
-    printf("-----------------------------------------------------------------\n");
+    printf("-----------------------------------------------------------------\n\n");
+
     pid_t p = fork(); /* 1 */
     if (p == 0) {
         // process P1
@@ -82,7 +89,7 @@ int main(int argc, char *argv[]) {
             err = execlp("gcc", "gcc", nom_module_objet, "-o", nom_executable, NULL);
             if (err == -1) {
                 printf("\nexeclp de P2 non executée\n");
-                perror("execlp 2");
+                perror("execlp 2 ");
                 exit(EXIT_FAILURE);
             }
         } else if (p > 0) {
@@ -109,7 +116,7 @@ int main(int argc, char *argv[]) {
                 err = execlp(executer_programme, nom_executable, NULL);
                 if (err == -1) {
                     printf("\nexeclp de P3 non executée\n");
-                    perror("execlp 3");
+                    perror("execlp 3 ");
                     exit(EXIT_FAILURE);
                 }
             } else if (p > 0) {
@@ -129,17 +136,17 @@ int main(int argc, char *argv[]) {
                 }
             } else {
                 printf("erreur dans l'execution de fork 3\n");
-                perror("fork 3");
+                perror("fork 3 ");
                 exit(EXIT_FAILURE);
             }
         } else {
             printf("erreur dans l'execution fork 2\n");
-            perror("fork 2");
+            perror("fork 2 ");
             exit(EXIT_FAILURE);
         }
     } else {
         printf("erreur dans l'execution fork 1\n");
-        perror("fork 1");
+        perror("fork 1 ");
         exit(EXIT_FAILURE);
     }
     return 0;
