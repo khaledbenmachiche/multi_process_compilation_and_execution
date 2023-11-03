@@ -29,7 +29,7 @@ int code_retour_tests(pid_t p, int status) {
 }
 
 int main(int argc, char *argv[]) {
-    if (argc > 2) {
+    if (argc > 2 || argc == 1) {
         printf("utilisation: %s <programme.c>\n", argv[0]);
         return 1;
     }
