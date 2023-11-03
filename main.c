@@ -25,6 +25,7 @@ int code_retour_tests(pid_t p, int status) {
             exit(3);
         }
     }
+    return 0;
 }
 
 int main(int argc, char *argv[]) {
@@ -53,7 +54,7 @@ int main(int argc, char *argv[]) {
 
     // nom d'exécutable
     char nom_executable[nom_programme_len - 1];
-    memset(nom_executable, 0, nom_programme_len);
+    memset(nom_executable, 0, nom_programme_len - 1);
     strncpy(nom_executable, nom_programme, nom_programme_len - 2);
 
     // affichage
